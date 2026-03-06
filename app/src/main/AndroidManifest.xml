@@ -12,6 +12,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Composelab">
         <activity
+            android:name=".section3.Test1Activity"
+            android:exported="true"
+            android:label="@string/title_activity_test1"
+            android:theme="@style/Theme.Composelab">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".section2.TestActivity"
             android:exported="true"
             android:label="@string/title_activity_test"
