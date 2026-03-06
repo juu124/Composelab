@@ -60,7 +60,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     val state = rememberScrollState()
     val context = LocalContext.current
 
-    Column(modifier = Modifier.verticalScroll(state)) {
+    Column(modifier = Modifier.verticalScroll(state).then(modifier)) {
         Text(
             text = stringResource(R.string.app_name).repeat(20),
             color = Color.Red,
