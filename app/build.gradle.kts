@@ -58,4 +58,7 @@ dependencies {
 
     implementation("io.coil-kt.coil3:coil-compose:3.1.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.1.0")
+
+    // 기본 google의 아이콘 이외의 추가 아이콘
+    implementation("androidx.compose.material:material-icons-extended:1.7.6")
 }
