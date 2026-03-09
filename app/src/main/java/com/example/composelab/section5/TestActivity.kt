@@ -20,9 +20,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.composelab.section5.ui.theme.ComposelabTheme
 
 class TestActivity : ComponentActivity() {
@@ -52,7 +54,28 @@ fun MainScreen(name: String, modifier: Modifier = Modifier) {
     NavHost(navController = navController, startDestination = "home") {
         // 화면 composable을 식별자 문자열로 등록
         composable("home") { HomeScreen(navController) }
-        composable("one") { OneScreen(navController) }
+        // navigate로 화면 이동하면서 데이터 전달. URL 처럼. 간단한 데이터를 넘기기에 좋다.
+        // 개발자 객체를 넘기려면 viewModel로 개발자 데이터를 넘기면 된다.
+        // composable 이름에 전달하고자 하는 데이터를 선언한다.
+        composable(
+            // OneScreen에 이동할때 해당 데이터를 곡 전달해줘야한다.
+            "one/{userId}/{no}",
+            arguments = listOf(
+                navArgument("userId") {
+                    type = NavType.StringType
+                },
+                navArgument("no") {
+                    type = NavType.IntType
+                }
+            )
+        ) { navBackStackEntry ->
+            // OneScreen에 이동할때 해당 데이터를 곡 전달해줘야한다.
+            // 그러니 아래 형태 처럼 만들어준다.
+            OneScreen(navController,
+                navBackStackEntry.arguments?.getString("userId"),
+                navBackStackEntry.arguments?.getInt("no")
+            )
+        }
         composable("oneSub") { OneSubScreen(navController) }
         composable("two") { TwoScreen(navController) }
     }
@@ -60,6 +83,10 @@ fun MainScreen(name: String, modifier: Modifier = Modifier) {
 
 @Composable
 fun HomeScreen(navController: NavController) {
+
+    // pop 으로 되돌아 올때 결과 데이터 획득
+    val msg = navController.currentBackStackEntry?.savedStateHandle?.get<String>("msg")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,8 +94,8 @@ fun HomeScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("I am Home Screen", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-        Button(onClick = { navController.navigate("one") }) {
+        Text("I am Home Screen : $msg", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+        Button(onClick = { navController.navigate("one/lee/20") }) {
             Text("Go One")
         }
         Button(onClick = { navController.navigate("two") }) {
@@ -78,7 +105,7 @@ fun HomeScreen(navController: NavController) {
 }
 
 @Composable
-fun OneScreen(navController: NavController) {
+fun OneScreen(navController: NavController, userId: String?, no: Int?) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,7 +113,7 @@ fun OneScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("I am One Screen", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+        Text("I am One Screen - $userId - $no", fontSize = 30.sp, fontWeight = FontWeight.Bold)
         Button(onClick = {
             navController.navigate("oneSub") {
                 // oneSub으로 화면전환할때 작업을 명시할 수 있다.
@@ -128,7 +155,12 @@ fun TwoScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center
     ) {
         Text("I am Two Screen", fontSize = 30.sp, fontWeight = FontWeight.Bold)
-        Button(onClick = { navController.popBackStack() }) {
+        Button(onClick = {
+            // 결과 데이터 포함
+            // two 화면에서 발생한 데이터를 이전 화면으로 가지고 가겠다.
+            navController.previousBackStackEntry?.savedStateHandle?.set("msg", "jay")
+            navController.popBackStack()
+        }) {
             Text("Go Back")
         }
     }
